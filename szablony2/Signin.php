@@ -35,7 +35,7 @@
       </form>
 
 <center><p class="text-muted">
-<
+<?php
         if (isset($_POST['log']))
           {
             if (isset($_POST['pass']))
