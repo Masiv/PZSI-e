@@ -8,15 +8,14 @@
     <meta name="author" content="">
     <link rel="shortcut icon" href="">
 
-    <title>Koncerty - ewidencja</title>
+    <title>Koncerty - ewidencja: Logowanie</title>
 
     <!-- Bootstrap core CSS -->
-    <link href="Signin%20Template%20for%20Bootstrap_pliki/bootstrap.css" rel="stylesheet">
+    <link href="css/logowanie//bootstrap.css" rel="stylesheet">
 
     <!-- Custom styles for this template -->
-    <link href="Signin%20Template%20for%20Bootstrap_pliki/signin.css" rel="stylesheet">
+    <link href="css/logowanie/signin.css" rel="stylesheet">
 
-        <link href="Sticky%20Footer%20Navbar%20Template%20for%20Bootstrap_pliki/sticky-footer-navbar.css" rel="stylesheet">
 
   </head>
 
@@ -38,30 +37,37 @@
 <center><p class="text-muted">
 <?php
 session_start();
-mysql_connect("","","");
-mysql_select_db("");
+
+if(isset($_POST['wyloguj'])) {
+$_SESSION['zalogowany'] = false;
+session_destroy();
+echo "Zostałeś wylogowany. Nie wiem why powie Ci że: ";
+}
+
+
+mysql_connect("localhost","root","");
+mysql_select_db("u409462969_bilet");
 
 if(isset($_SESSION['zalogowany'])) {
-echo "Witam, ".$_SESSION['login']; 
+echo "Witaj, ".$_SESSION['login'].", sesja istnieje, jesteś zalogowany "; 
 }else{
 
 if(isset($_POST['wyslij'])) {
 
-   if(mysql_num_rows(mysql_query("SELECT login
-   FROM pracownik WHERE login = '".$_POST['log']."' ")) > 0) //spawdza czy jest taki login 
+   if(mysql_num_rows(mysql_query("SELECT login, haslo
+   FROM pracownik WHERE login = '".$_POST['log']."' && haslo = '".$_POST['pass']."' ")) > 0) //spawdza czy jest taki login 
        {
 
-       if(mysql_num_rows(mysql_query("SELECT nr FROM konta  
+       if(mysql_num_rows(mysql_query("SELECT idPracownik FROM pracownik  
        WHERE login = '".$_POST['log']."' 
        && haslo = '".$_POST['pass']."' ")) > 0 ) {   //sprawdza czy jest taka kombinacja loginu i hasła, kwestią bazy jest unikalnosc uzytkownikow
 
 
            $_SESSION['zalogowany'] = true;
- /*          $_SESSION['login'] = $_POST['log'];  //dlaczego sesja ma przechowywać login i haslo?
-           $_SESSION['haslo'] = $_POST['pass'];
-  */
-           echo "Jesteś zalogowany.";
+          $_SESSION['login'] = $_POST['log'];  //dlaczego sesja ma przechowywać login i haslo? Chyba tylko po to, żeby przywitac
+//           $_SESSION['haslo'] = $_POST['pass'];
 
+           echo "Jesteś zalogowany.";
 
        } else { 
         echo "Złe hasło, proszę spróbować ponownie";
@@ -74,10 +80,7 @@ mysql_close();
 }
 }
 
-if(isset($_POST['wyloguj'])) {
-session_destroy();
-echo "Zostałeś wylogowany";
-}
+
 ?>
 
 </p>
