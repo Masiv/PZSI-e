@@ -1,0 +1,9 @@
+
+
+<?php
+if($_GET['id']=="galeria"){
+include("dane/galeria.html");
+}
+?>
+
+http://d4u.pl/warsztat/tutoriale/prosta-strona-w-php.html
