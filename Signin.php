@@ -29,13 +29,12 @@ ini_set('display_errors',1);
 
       <form class="form-signin" role="form" action="signin.php" method="post">
         <h2 class="form-signin-heading">Logowanie</h2>
-        <input class="form-control" placeholder="Użytkownik"  autofocus="" type="text" name="log">
-        <input class="form-control" placeholder="Hasło"  type="password" name="pass">
+        <input class="form-control" placeholder="Użytkownik"  autofocus="" type="text" name="log" required>
+        <input class="form-control" placeholder="Hasło"  type="password" name="pass" required> 
        <!--  <label class="checkbox">
           <input value="remember-me" type="checkbox" name="pamietaj"> Pamiętaj mnie
         </label> -->
         <button class="btn btn-lg btn-primary btn-block" type="submit" name='wyslij'>Zaloguj się</button>
-        <button class="btn btn-lg btn-primary btn-block" type="submit" name='wyloguj'>Wyloguj się</button>
       </form>
 
 <center><p class="text-muted">
@@ -48,15 +47,9 @@ print_r($pre);
 echo '</pre>';
 }
 
-if(isset($_POST['wyloguj'])) {
-//session_destroy();
-unset($_SESSION['zalogowany']);
-
-echo "Zostałeś wylogowany.";
-}
 
 if(isset($_SESSION['zalogowany'])) {
-echo "Witaj, ".$_SESSION['login'].", sesja istnieje, jesteś zalogowany "; 
+header("Location: /index.php");
 }else{
 
 if(isset($_POST['wyslij'])) {
@@ -64,25 +57,34 @@ if(isset($_POST['wyslij'])) {
    $_login = $_POST['log'];
 //  $_login = htmlspecialchars($_POST['log'], ENT_QUOTES);
 //   $_haslo = sha1($_POST[pas]);   
-   $_haslo = $_POST['pass'];      
+   $_haslo = $_POST['pass'];  
+   $_md5_pass = md5($_haslo);   
+   
+//weryfikowanie poprawności wpisywanych znakow do pola 
+   
+   
+  if(!preg_match( '/^[A-Za-zĄąĆćĘęŁłŃńÓóŚśŹźŻż0-9]+$/ui', $_login )) {
+  echo 'Bledna nazwa uzytkonika!';
 
-   if(mysql_num_rows(mysql_query("SELECT login FROM Pracownik WHERE login = '$_login'")) > 0) //spawdza czy jest taki login 
+//porównywanie wpisanych danych z danymi w bazie    
+
+   } elseif(mysql_num_rows(mysql_query("SELECT login FROM Pracownik WHERE login = '$_login'")) > 0) //spawdza czy jest taki login 
        {
      
        if(mysql_num_rows(mysql_query("SELECT idPracownik FROM Pracownik  
-       WHERE login = '$_login' && haslo = '$_haslo'")) > 0) {   //sprawdza czy jest taka kombinacja loginu i hasła, kwestią bazy jest unikalnosc uzytkownikow
+       WHERE login = '$_login' && haslo = '$_md5_pass'")) > 0) {   //sprawdza czy jest taka kombinacja loginu i hasła, kwestią bazy jest unikalnosc uzytkownikow
 
           $_SESSION['zalogowany'] = true;
           $_SESSION['login'] = $_POST['log'];  
 
-          echo "Jesteś zalogowany.";
+          header("Location: /index.php");
 
        } else { 
         echo "Złe hasło, proszę spróbować ponownie";
         }
 
     } else { 
-   echo "Nie ma takiego użytkownika";
+   echo "Nazwa użytkownika bledna";
     }
 mysql_close();
 }
